@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.3.0 (2026/07/05)
+
+- Update PDF.js to 6.1.200 (from 3.1.81)
+  - Switch the bundled viewer to the ESM prebuilt (`pdf.mjs`, `pdf.worker.mjs`, `viewer.mjs`)
+  - Load the viewer scripts as `type="module"`; resolve worker/wasm/icc assets to absolute webview URIs
+  - Replace the removed `createPromiseCapability` with `Promise.withResolvers()`
+  - Update l10n wiring to Fluent (`locale/locale.json` + `.ftl`)
+  - Widen the Content-Security-Policy for module scripts, the worker and wasm
+  - Render the viewer from the stock `web/viewer.html` at runtime instead of a hand-ported HTML template
+
 ## 1.2.2 (2022/12/23)
 
 - Fix about rendering Unicode characters
