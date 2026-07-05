@@ -12,3 +12,14 @@ html, body {
   width: 100%;
   height: 100%;
 }
+
+/* Hide actions unsupported in the read-only webview: open, print, save/download and the annotation editors */
+#editorModeButtons,
+#editorModeSeparator,
+#printButton,
+#downloadButton,
+#secondaryOpenFile,
+#secondaryPrint,
+#secondaryDownload {
+  display: none !important;
+}
