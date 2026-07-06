@@ -3,7 +3,7 @@
   "displayName": "vscode-pdf",
   "description": "Display pdf file in VSCode.",
   "version": "1.3.0",
-  "publisher": "tomoki1207",
+  "publisher": "cassandragargoyle",
   "engines": {
     "vscode": "^1.46.0"
   },
@@ -17,10 +17,10 @@
   "icon": "vscode-pdf.png",
   "repository": {
     "type": "git",
-    "url": "https://github.com/tomoki1207/vscode-pdfviewer.git"
+    "url": "https://github.com/cassandragargoyle/portunix-vscode-pdf-viewer.git"
   },
   "bugs": {
-    "url": "https://github.com/tomoki1207/vscode-pdfviewer/issues"
+    "url": "https://github.com/cassandragargoyle/portunix-vscode-pdf-viewer/issues"
   },
   "activationEvents": [
     "onCustomEditor:pdf.preview"
