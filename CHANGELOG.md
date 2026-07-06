@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.3.1 (2026/07/06)
+
+Fixes broken PDF preview shipped in 1.3.0. **Version 1.3.0 was not functional** —
+after the pdf.js 6.x upgrade the viewer failed to render any PDF and showed only a
+generic "An error occurred while loading the file. Please open it again." message.
+(#083)
+
+- Load the pdf.js worker from a same-origin `blob:` URL, avoiding the failing
+  `await import(...)` CDN wrapper that broke worker startup in the VS Code webview
+- Apply the default view (cursor/scroll/spread/sidebar/zoom) via pdf.js `*OnLoad`
+  options instead of the removed `pdfSidebar` / `pdfCursorTools` objects, which
+  threw `Cannot read properties of undefined` on document load
+- Replace the silent `window.onerror` with a diagnostic handler that surfaces the
+  real error (message, source, stack, failing resource) instead of hiding it
+
 ## 1.3.0 (2026/07/05)
 
 - Update PDF.js to 6.1.200 (from 3.1.81)
