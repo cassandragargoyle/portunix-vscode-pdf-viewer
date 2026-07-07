@@ -107,7 +107,11 @@ export class PdfPreview extends Disposable {
     const config = vscode.workspace.getConfiguration('pdf-preview');
     const settings = {
       cMapUrl: resolveAsUri('lib', 'web', 'cmaps/').toString(),
-      standardFontDataUrl: resolveAsUri('lib', 'web', 'standard_fonts/').toString(),
+      standardFontDataUrl: resolveAsUri(
+        'lib',
+        'web',
+        'standard_fonts/'
+      ).toString(),
       wasmUrl: resolveAsUri('lib', 'web', 'wasm/').toString(),
       iccUrl: resolveAsUri('lib', 'web', 'iccs/').toString(),
       workerSrc: resolveAsUri('lib', 'build', 'pdf.worker.mjs').toString(),
@@ -129,7 +133,11 @@ export class PdfPreview extends Disposable {
       'web',
       'viewer.html'
     );
-    let html = fs.readFileSync(viewerHtmlPath, 'utf8').replace(/^﻿/, '');
+    // Strip a leading UTF-8 BOM (U+FEFF) so injected tags land at the top of <head>
+    let html = fs.readFileSync(viewerHtmlPath, 'utf8');
+    if (html.charCodeAt(0) === 0xfeff) {
+      html = html.slice(1);
+    }
 
     const csp = `<meta http-equiv="Content-Security-Policy" content="default-src 'none'; connect-src ${cspSource} blob: data:; script-src 'unsafe-inline' 'wasm-unsafe-eval' ${cspSource}; style-src 'unsafe-inline' ${cspSource}; img-src blob: data: ${cspSource}; media-src blob:; font-src ${cspSource} data: blob:; worker-src ${cspSource} blob:;">`;
     html = html.replace(

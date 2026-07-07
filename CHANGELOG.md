@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.3.2 (2026/07/07)
+
+Build-time dependency cleanup — no functional changes to the viewer. (#091)
+
+- Replace deprecated devDependencies that pulled unsupported transitive packages
+  (`rimraf@2/3`, `glob@7`, `inflight`, `prebuild-install`): upgrade `eslint` 6 → 9
+  (flat config), `typescript` 3.7 → 5.8, `prettier` 2 → 3
+- Drop `vsce`, `vscode-test`, `vscode-dts` and the unused test runner; package via
+  `npx @vscode/vsce`
+- Move `@types/vscode` from `dependencies` to `devDependencies`
+- `npm install` now completes with no deprecation warnings and no vulnerabilities
+
 ## 1.3.1 (2026/07/06)
 
 Fixes broken PDF preview shipped in 1.3.0. **Version 1.3.0 was not functional** —

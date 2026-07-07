@@ -5,5 +5,6 @@ test/**
 src/**
 **/*.map
 .gitignore
+eslint.config.mjs
 tsconfig.json
 vsc-extension-quickstart.md
