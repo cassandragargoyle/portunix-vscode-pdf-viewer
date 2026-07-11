@@ -1,11 +1,18 @@
 import * as vscode from 'vscode';
-import { PdfPreview } from './pdfPreview';
+import { PdfPreview, PdfWebviewMessage } from './pdfPreview';
 
 export class PdfCustomProvider implements vscode.CustomReadonlyEditorProvider {
   public static readonly viewType = 'pdf.preview';
 
   private readonly _previews = new Set<PdfPreview>();
   private _activePreview: PdfPreview | undefined;
+
+  // Re-emits messages the viewer glue posts from any open preview; consumed by
+  // the extension API so the smoke check (issue 084) can observe viewer loads
+  private readonly _onDidReceiveWebviewMessage =
+    new vscode.EventEmitter<PdfWebviewMessage>();
+  public readonly onDidReceiveWebviewMessage =
+    this._onDidReceiveWebviewMessage.event;
 
   constructor(private readonly extensionRoot: vscode.Uri) {}
 
@@ -20,7 +27,8 @@ export class PdfCustomProvider implements vscode.CustomReadonlyEditorProvider {
     const preview = new PdfPreview(
       this.extensionRoot,
       document.uri,
-      webviewEditor
+      webviewEditor,
+      (message) => this._onDidReceiveWebviewMessage.fire(message)
     );
     this._previews.add(preview);
     this.setActivePreview(preview);
