@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.3.3 (2026/07/11)
+
+Adds an end-to-end smoke check so a broken viewer is caught at build time instead
+of by a user — the regression guard deferred from 1.3.1. (#084)
+
+- Add a VS Code Extension Test Host smoke test (`@vscode/test-electron` + mocha)
+  that opens a known-good PDF in the real webview and asserts the viewer reaches
+  `documentloaded` without surfacing the 1.3.1 diagnostic error overlay
+- Post viewer lifecycle messages (`documentloaded`, `pdf-viewer-error`) from the
+  glue to the extension host; guarded so it is a no-op in the Pilot (Electron)
+  host, which exposes no `acquireVsCodeApi`
+- Expose an extension API (`onDidReceiveWebviewMessage`) so the test can observe
+  the webview end-to-end without reading its DOM
+- The check runs as part of the Pilot plugin build (gates the `.vsix`); opt out
+  with `PORTUNIX_SKIP_PLUGIN_SMOKE=1`
+
 ## 1.3.2 (2026/07/07)
 
 Build-time dependency cleanup — no functional changes to the viewer. (#091)

@@ -1,7 +1,14 @@
 import * as vscode from 'vscode';
 import { PdfCustomProvider } from './pdfProvider';
+import { PdfWebviewMessage } from './pdfPreview';
 
-export function activate(context: vscode.ExtensionContext): void {
+// Public extension API returned from activate(); lets an integration test observe
+// viewer lifecycle messages posted from the webview (smoke check, issue 084)
+export interface PdfExtensionApi {
+  onDidReceiveWebviewMessage: vscode.Event<PdfWebviewMessage>;
+}
+
+export function activate(context: vscode.ExtensionContext): PdfExtensionApi {
   const extensionRoot = vscode.Uri.file(context.extensionPath);
   // Register our custom editor provider
   const provider = new PdfCustomProvider(extensionRoot);
@@ -17,6 +24,8 @@ export function activate(context: vscode.ExtensionContext): void {
       }
     )
   );
+
+  return { onDidReceiveWebviewMessage: provider.onDidReceiveWebviewMessage };
 }
 
 export function deactivate(): void {}
