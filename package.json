@@ -14,7 +14,7 @@
     "pdf",
     "viewer"
   ],
-  "icon": "vscode-pdf.png",
+  "icon": "vscode-pdf-portunix.png",
   "repository": {
     "type": "git",
     "url": "https://github.com/cassandragargoyle/portunix-vscode-pdf-viewer.git"
