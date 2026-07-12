@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.3.4 (2026/07/12)
+
+Rebrands the extension for its Visual Studio Marketplace debut — no change to the
+viewer itself.
+
+- Rename the extension to `portunix-pdf-viewer` (Marketplace id
+  `cassandragargoyle.portunix-pdf-viewer`); the generic `pdf` name was already taken
+- Set the display name to "Portunix PDF Viewer"
+- Trim `.github`, `GOVERNANCE.md` and the unused legacy icon from the packaged `.vsix`
+
 ## 1.3.3 (2026/07/11)
 
 Adds an end-to-end smoke check so a broken viewer is caught at build time instead
