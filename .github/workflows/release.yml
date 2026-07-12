@@ -91,7 +91,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           TAG="${{ steps.gate.outputs.tag }}"
-          VSIX=$(ls pdf-*.vsix | head -1)
+          VSIX=$(ls *.vsix | head -1)
           echo "Publishing $VSIX as $TAG"
           if gh release view "$TAG" >/dev/null 2>&1; then
             gh release upload "$TAG" "$VSIX" --clobber

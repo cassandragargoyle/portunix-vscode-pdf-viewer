@@ -1,6 +1,6 @@
 {
-  "name": "pdf",
-  "displayName": "vscode-pdf",
+  "name": "portunix-pdf-viewer",
+  "displayName": "Portunix PDF Viewer",
   "description": "Display pdf file in VSCode.",
   "version": "1.3.3",
   "publisher": "cassandragargoyle",
