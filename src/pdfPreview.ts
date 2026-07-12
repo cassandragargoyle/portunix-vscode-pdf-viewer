@@ -9,13 +9,22 @@ function escapeAttribute(value: string | vscode.Uri): string {
 
 type PreviewState = 'Disposed' | 'Visible' | 'Active';
 
+// Messages the bundled viewer glue (lib/main.js) posts back to the host; used by
+// the smoke check (issue 084) to observe the viewer's end-to-end load lifecycle
+export interface PdfWebviewMessage {
+  type: string;
+  kind?: string;
+  detail?: string;
+}
+
 export class PdfPreview extends Disposable {
   private _previewState: PreviewState = 'Visible';
 
   constructor(
     private readonly extensionRoot: vscode.Uri,
     private readonly resource: vscode.Uri,
-    private readonly webviewEditor: vscode.WebviewPanel
+    private readonly webviewEditor: vscode.WebviewPanel,
+    private readonly onWebviewMessage?: (message: PdfWebviewMessage) => void
   ) {
     super();
     const resourceRoot = resource.with({
@@ -40,6 +49,7 @@ export class PdfPreview extends Disposable {
             break;
           }
         }
+        this.onWebviewMessage?.(message);
       })
     );
 

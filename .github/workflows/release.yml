@@ -1,0 +1,102 @@
+# Build the extension and publish a GitHub Release when package.json version changes
+# Packages pdf-<version>.vsix and attaches it to a v<version> release, notes from CHANGELOG
+
+name: Release
+
+on:
+  push:
+    branches: [main]
+    paths: ['package.json']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2 # need the previous commit to diff the version
+
+      - name: Detect version change
+        id: ver
+        run: |
+          NEW=$(node -p "require('./package.json').version")
+          OLD=""
+          if git rev-parse HEAD^ >/dev/null 2>&1; then
+            git show HEAD^:package.json > /tmp/old-package.json 2>/dev/null \
+              && OLD=$(node -p "require('/tmp/old-package.json').version" 2>/dev/null || echo "")
+          fi
+          CHANGED=false
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] || [ "$NEW" != "$OLD" ]; then
+            CHANGED=true
+          fi
+          echo "new=$NEW" >> "$GITHUB_OUTPUT"
+          echo "changed=$CHANGED" >> "$GITHUB_OUTPUT"
+          echo "Version '$OLD' -> '$NEW' (changed=$CHANGED)"
+
+      - name: Setup Node
+        if: steps.ver.outputs.changed == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        if: steps.ver.outputs.changed == 'true'
+        run: npm ci
+
+      - name: Build and package VSIX
+        if: steps.ver.outputs.changed == 'true'
+        run: npm run package # runs vscode:prepublish (compile) then vsce package
+
+      - name: Extract release notes from CHANGELOG
+        if: steps.ver.outputs.changed == 'true'
+        id: notes
+        run: |
+          VERSION="${{ steps.ver.outputs.new }}"
+          # Grab the CHANGELOG section for this version (lines from its heading to the next "## ")
+          awk -v v="$VERSION" '
+            $0 ~ "^## " v "( |\\()" {grab=1; next}
+            grab && /^## / {exit}
+            grab {print}
+          ' CHANGELOG.md > /tmp/notes.md
+          if [ ! -s /tmp/notes.md ]; then
+            echo "Release of pdf-viewer $VERSION." > /tmp/notes.md
+          fi
+          echo "path=/tmp/notes.md" >> "$GITHUB_OUTPUT"
+
+      - name: Tag the release commit
+        if: steps.ver.outputs.changed == 'true'
+        run: |
+          VERSION="${{ steps.ver.outputs.new }}"
+          TAG="v$VERSION"
+          if git rev-parse "$TAG" >/dev/null 2>&1 || git ls-remote --exit-code --tags origin "$TAG" >/dev/null 2>&1; then
+            echo "Tag $TAG already exists — skipping tag creation"
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git tag -a "$TAG" -m "pdf-viewer $VERSION"
+            git push origin "$TAG"
+            echo "Created and pushed tag $TAG"
+          fi
+
+      - name: Create or update GitHub Release
+        if: steps.ver.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION="${{ steps.ver.outputs.new }}"
+          TAG="v$VERSION"
+          VSIX=$(ls pdf-*.vsix | head -1)
+          echo "Publishing $VSIX as $TAG"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" "$VSIX" --clobber
+          else
+            gh release create "$TAG" "$VSIX" \
+              --title "$TAG" \
+              --notes-file "${{ steps.notes.outputs.path }}"
+          fi
