@@ -12,7 +12,7 @@ suite('PDF viewer smoke check (issue 084)', () => {
     this.timeout(45000);
 
     const ext = vscode.extensions.getExtension<PdfExtensionApi>(
-      'cassandragargoyle.pdf'
+      'cassandragargoyle.portunix-pdf-viewer'
     );
     assert.ok(ext, 'pdf extension not found');
     const api = await ext.activate();
